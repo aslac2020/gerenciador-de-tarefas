@@ -3,6 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger/swagger.json');
 const LoginController = require('./controllers/LoginController');
 const AppConstants = require('./enum/AppConstants');
+const MongoDBConnectionHelper = require('./helpers/MongoDBConnectionHelper');
 
 class App {
 
@@ -10,6 +11,8 @@ class App {
     start(){
         //configurar Express
         this.#configureExpress();
+        //Conexão com o banco de dados
+        this.#configureBancoDados();
         // carregar os controllers
         this.#loadingController();
         //iniciar o servidor
@@ -32,6 +35,10 @@ class App {
             console.log(`requisição recebida, url=${req.url}, metodo http=${req.method}`);
             next();
         })
+    }
+
+    #configureBancoDados = () => {
+        MongoDBConnectionHelper.connect();
     }
 
     #loadingController = () => {
