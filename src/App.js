@@ -5,6 +5,9 @@ const LoginController = require('./controllers/LoginController');
 const AppConstants = require('./enum/AppConstants');
 const MongoDBConnectionHelper = require('./helpers/MongoDBConnectionHelper');
 
+const logger = require('./middlewares/logger');
+const jwt = require('./middlewares/jwt');
+
 class App {
 
     #controllers;
@@ -22,8 +25,14 @@ class App {
     #configureExpress = () => {
         this.express = express();
 
+        //registra o log das requisições
+        this.express.use(logger);
+
         this.express.use(express.urlencoded({ extended: true }));
         this.express.use(express.json());
+
+        //registra o log jwt para validar o acesso do usuario
+        this.express.use(jwt);
 
         //configuração do swagger
         this.express.use(`${AppConstants.BASE_API_URL}/docs`, 
@@ -31,10 +40,6 @@ class App {
          swaggerUi.setup(swaggerFile)
         );
 
-        this.express.use((req, res, next) => {
-            console.log(`requisição recebida, url=${req.url}, metodo http=${req.method}`);
-            next();
-        })
     }
 
     #configureBancoDados = () => {
