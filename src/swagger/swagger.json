@@ -11,15 +11,52 @@
     "/login": {
       "post": {
         "summary": "Faz autenticação do usuario e devolve token de acesso",
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "schema": {
-              "$ref": "#/definitions/LoginSucesso"
+              "$ref": "#/definitions/LoginResponse200"
             }
           },
           "400": {
             "schema": {
-              "$ref": "#/definitions/LoginInvalido"
+              "$ref": "#/definitions/ResponseErro"
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Faz cadastrado do usuário no processo",
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UsuarioCadastroRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UsuarioCadastroResponse200"
+            }
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/ResponseErro"
             }
           }
         }
@@ -27,16 +64,75 @@
     }
   },
   "definitions": {
-    "LoginSucesso": {
+    "LoginRequest": {
       "type": "object",
       "properties": {
+        "login": {
+          "type": "string",
+          "example": "fulano@fulano.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "senha1"
+        }
+      }
+    },
+    "LoginResponse200": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": "1"
+        },
+        "name": {
+          "type": "string",
+          "example": "Fulano da Silva"
+        },
+        "email": {
+          "type": "string",
+          "example": "fulano@fulano.com"
+        },
         "token": {
           "type": "string",
           "example": "fff5256524f315d12"
         }
       }
     },
-    "LoginInvalido": {
+    "UsuarioCadastroRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Fulano da Silva"
+        },
+        "email": {
+          "type": "string",
+          "example": "fulano@fulano.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "senha"
+        }
+      }
+    },
+    "UsuarioCadastroResponse200": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Fulano da Silva"
+        },
+        "email": {
+          "type": "string",
+          "example": "fulano@fulano.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "senha"
+        }
+      }
+    },
+    "ResponseErro": {
       "type": "object",
       "properties": {
         "status": {
