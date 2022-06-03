@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const UsersRepository = require("../repositories/impl/MongoDBUsersRepository")
 
 //lista de rotas publicas da aplicacao
 const routesPublic = [
@@ -56,7 +57,7 @@ module.exports = (req, res, next) => {
   }
 
   //verificando se o token passado é valido
-  jwt.verify(token, process.env.KEY_SECRET_JWT, (err, decoded) => {
+  jwt.verify(token, process.env.KEY_SECRET_JWT, async (err, decoded) => {
     if (err) {
       req.logger.error("Erro ao decodificar o token jwt", `token=${token}`);
       return res.status(401).json({
@@ -67,9 +68,14 @@ module.exports = (req, res, next) => {
 
     req.logger.debug("Token JWT decodificado", `idUsuario=${decoded._id}`);
     //TODO: carregar o usuario a partir do banco de dados
-    const user = {
-      id: decoded._id,
-    };
+    const user = await UsersRepository.filterUserById(decoded._id);
+    if(!user){
+      req.logger.error("Usuário não encontrado no banco", `id=${decoded._id}`);
+      return res.status(401).json({
+        status: 401,
+        erro: "Acesso negado, usuário não encontrado",
+      });
+    }
 
     req.user = user;
     next();

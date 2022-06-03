@@ -7,6 +7,10 @@ module.exports = (implementation) => {
         throw new Error(`A classe ${implementation} não implementou o método filtrar!`)
     }
 
+    if(!implementation.filterUserById){
+        throw new Error(`A classe ${implementation} não implementou o método filtrar por Usuario id!`)
+    }
+
 
     return implementation;
 }

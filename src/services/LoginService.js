@@ -1,17 +1,24 @@
-const jwt = require('jsonwebtoken')
-
+const jwt = require("jsonwebtoken");
+const md5 = require("md5");
+const UsersRepository = require("../repositories/impl/MongoDBUsersRepository");
 
 class LoginService {
-  logar(login, password) {
+  async logar(login, password) {
+    const filterUser = {
+      email: login,
+      password: md5(password),
+    };
 
-    const user = {
-        id: 1,
-        name: 'Usuário Fake',
-        email: 'fake@fake.com'
+    let user = null;
+    const listUsers = await UsersRepository.filterUser(filterUser);
+    if (listUsers && listUsers.length) {
+      user = listUsers[0];
+    }else {
+      return null;
     }
 
     //gerar token jwt
-   const token = jwt.sign({ _id: user.id }, process.env.KEY_SECRET_JWT);
+    const token = jwt.sign({ _id: user.id }, process.env.KEY_SECRET_JWT);
 
     return {
       ...user,
