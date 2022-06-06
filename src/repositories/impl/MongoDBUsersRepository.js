@@ -4,7 +4,7 @@ const Users = require("../../models/Users");
 //pega usuario do banco de dados
 const transformUser = (userDb) => {
   return {
-    id: userDb._doc._id,
+    id: userDb._doc._id.toString(),
     name: userDb._doc.name,
     email: userDb._doc.email,
   };

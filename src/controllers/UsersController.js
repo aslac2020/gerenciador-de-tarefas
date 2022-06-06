@@ -13,7 +13,6 @@ class UsersController extends HttpController {
 
             const userService = new UserService();
             const returnService = await userService.register(dataUser);
-
             if(returnService.errors){
                 return res.status(400).json({
                     status: 400,

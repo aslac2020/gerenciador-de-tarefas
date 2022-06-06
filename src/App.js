@@ -3,6 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger/swagger.json');
 const LoginController = require('./controllers/LoginController');
 const UsersController = require('./controllers/UsersController');
+const TaskController = require('./controllers/TaskController');
 const AppConstants = require('./enum/AppConstants');
 const MongoDBConnectionHelper = require('./helpers/MongoDBConnectionHelper');
 
@@ -50,7 +51,8 @@ class App {
     #loadingController = () => {
         this.#controllers = [
             new LoginController(this.express),
-            new UsersController(this.express)
+            new UsersController(this.express),
+            new TaskController(this.express)
         ];
     }
 

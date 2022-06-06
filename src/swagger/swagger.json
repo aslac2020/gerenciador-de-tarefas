@@ -1,149 +1,486 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
-    "title": "Devaria API NodeJS"
+      "version": "1.0.0",
+      "title": "Devaria API NodeJS"
   },
   "basePath": "/api",
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
+  "securityDefinitions": {
+      "authorization": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "Authorization"
+      }
+  },
+  "consumes": [
+      "application/json"
+  ],
+  "produces": [
+      "application/json"
+  ],
+  "tags": [
+      {
+          "name": "Autenticação",
+          "description": "Operações relacionadas ao acesso do usuário da API"
+      },
+      {
+          "name": "Usuário",
+          "description": "Operações relacionadas ao cadastro de usuários do sistema"
+      },
+      {
+          "name": "Tarefas",
+          "description": "Operações relacionadas a gestão das tarefas"
+      }
+  ],
   "paths": {
-    "/login": {
-      "post": {
-        "summary": "Faz autenticação do usuario e devolve token de acesso",
-        "parameters": [
-          {
-            "name": "payload",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/LoginRequest"
-            }
+      "/login": {
+          "post": {
+              "tags": [
+                  "Autenticação"
+              ],
+              "summary": "Faz autenticação do usuário e devolve o token de acesso",
+              "parameters": [
+                  {
+                      "name": "payload",
+                      "in": "body",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/LoginRequest"
+                      }
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/LoginResponse200"
+                      }
+                  },
+                  "400": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro400"
+                      }
+                  }
+              }
           }
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/LoginResponse200"
-            }
+      },
+      "/users": {
+          "post": {
+              "tags": [
+                  "Usuário"
+              ],
+              "summary": "Faz cadastro do usuário no sistema",
+              "parameters": [
+                  {
+                      "name": "payload",
+                      "in": "body",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/UsuarioCadastroRequest"
+                      }
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/UsuarioCadastroResponse200"
+                      }
+                  },
+                  "400": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro400"
+                      }
+                  }
+              }
+          }
+      },
+      "/tasks": {
+          "get": {
+              "tags": [
+                  "Tarefas"
+              ],
+              "summary": "Obtém uma lista de tarefas",
+              "security": [
+                  {
+                      "authorization": []
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "periodoDe",
+                      "in": "query",
+                      "type": "string",
+                      "format": "date",
+                      "example": "2021-02-02",
+                      "description": "Período de início do filtro sobre a data prevista de conclusão"
+                  },
+                  {
+                      "name": "periodoAte",
+                      "in": "query",
+                      "type": "string",
+                      "format": "date",
+                      "example": "2021-02-02",
+                      "description": "Período de fim do filtro sobre a data prevista de conclusão"
+                  },
+                  {
+                      "name": "status",
+                      "in": "query",
+                      "type": "integer",
+                      "description": "Status da tarefa, use 1 para filtrar tarefas em aberto e 2 para filtrar tarefas concluídas"
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/TarefaListResponse"
+                      }
+                  },
+                  "401": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro401"
+                      }
+                  },
+                  "500": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro500"
+                      }
+                  }
+              }
           },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/ResponseErro"
-            }
+          "post": {
+              "tags": [
+                  "Tarefas"
+              ],
+              "summary": "Faz cadastro de uma tarefa no sistema",
+              "security": [
+                  {
+                      "authorization": []
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "payload",
+                      "in": "body",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/TarefaCadastroRequest"
+                      }
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/TarefaResponse200"
+                      }
+                  },
+                  "400": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro400"
+                      }
+                  },
+                  "401": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro401"
+                      }
+                  },
+                  "500": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro500"
+                      }
+                  }
+              }
           }
-        }
-      }
-    },
-    "/users": {
-      "post": {
-        "summary": "Faz cadastrado do usuário no processo",
-        "parameters": [
-          {
-            "name": "payload",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/UsuarioCadastroRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/UsuarioCadastroResponse200"
-            }
+      },
+      "/tasks/{id}": {
+          "put": {
+              "tags": [
+                  "Tarefas"
+              ],
+              "summary": "Atualiza os dados de uma tarefas",
+              "security": [
+                  {
+                      "authorization": []
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "id",
+                      "in": "path",
+                      "required": true
+                  },
+                  {
+                      "name": "Content-Type",
+                      "in": "header",
+                      "type": "string",
+                      "value": "application/json",
+                      "description": "Content-Type"
+                  },
+                  {
+                      "name": "payload",
+                      "in": "body",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/TarefaAtualizacaoRequest"
+                      }
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/TarefaResponse200"
+                      }
+                  },
+                  "400": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro400"
+                      }
+                  },
+                  "401": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro401"
+                      }
+                  },
+                  "500": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro500"
+                      }
+                  }
+              }
           },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/ResponseErro"
-            }
+          "delete": {
+              "tags": [
+                  "Tarefas"
+              ],
+              "summary": "Remove uma tarefa do sistema",
+              "security": [
+                  {
+                      "authorization": []
+                  }
+              ],
+              "parameters": [
+                  {
+                      "name": "id",
+                      "in": "path",
+                      "required": true
+                  },
+                  {
+                      "name": "Content-Type",
+                      "in": "header",
+                      "type": "string",
+                      "value": "application/json",
+                      "description": "Content-Type"
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "schema": {
+                          "$ref": "#/definitions/TarefaResponse200"
+                      }
+                  },
+                  "400": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro400"
+                      }
+                  },
+                  "401": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro401"
+                      }
+                  },
+                  "500": {
+                      "schema": {
+                          "$ref": "#/definitions/ResponseErro500"
+                      }
+                  }
+              }
           }
-        }
       }
-    }
   },
   "definitions": {
-    "LoginRequest": {
-      "type": "object",
-      "properties": {
-        "login": {
-          "type": "string",
-          "example": "fulano@fulano.com"
-        },
-        "password": {
-          "type": "string",
-          "example": "senha1"
-        }
+      "LoginRequest": {
+          "type": "object",
+          "properties": {
+              "login": {
+                  "type": "string",
+                  "example": "email@email.com"
+              },
+              "password": {
+                  "type": "string",
+                  "example": "senha123456"
+              }
+          }
+      },
+      "LoginResponse200": {
+          "type": "object",
+          "properties": {
+              "id": {
+                  "type": "number",
+                  "example": 1
+              },
+              "nome": {
+                  "type": "string",
+                  "example": "Fulano Da Silva"
+              },
+              "email": {
+                  "type": "string",
+                  "example": "email@email.com"
+              },
+              "token": {
+                  "type": "string",
+                  "example": "fd8si7yhfdg8hfod9ihjgdfghd89"
+              }
+          }
+      },
+      "UsuarioCadastroRequest": {
+          "type": "object",
+          "properties": {
+              "name": {
+                  "type": "string",
+                  "example": "Fulano Da Silva"
+              },
+              "email": {
+                  "type": "string",
+                  "example": "email@email.com"
+              },
+              "password": {
+                  "type": "string",
+                  "example": "senha"
+              }
+          }
+      },
+      "UsuarioCadastroResponse200": {
+          "type": "object",
+          "properties": {
+              "name": {
+                  "type": "string",
+                  "example": "Fulano Da Silva"
+              },
+              "email": {
+                  "type": "string",
+                  "example": "email@email.com"
+              },
+              "password": {
+                  "type": "string",
+                  "example": "senha"
+              }
+          }
+      },
+      "TarefaCadastroRequest": {
+          "type": "object",
+          "properties": {
+              "name": {
+                  "type": "string",
+                  "example": "Realizar atividade física",
+                  "required": true
+              },
+              "dataEstimatedTask": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2021-08-10",
+                  "required": true
+              },
+              "dataConclusionTask": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2021-08-12"
+              }
+          }
+      },
+      "TarefaAtualizacaoRequest": {
+          "type": "object",
+          "properties": {
+              "name": {
+                  "type": "string",
+                  "example": "Realizar atividade física"
+              },
+              "dataEstimatedTask": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2021-08-10"
+              },
+              "dataConclusionTask": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2021-08-12"
+              }
+          }
+      },
+      "TarefaResponse200": {
+          "type": "object",
+          "properties": {
+              "message": {
+                  "type": "string",
+                  "example": "Operação realizada com sucesso"
+              }
+          }
+      },
+      "TarefaListResponse": {
+          "type": "array",
+          "items": {
+              "type": "object",
+              "properties": {
+                  "id": {
+                      "type": "string",
+                      "example": "hdvs8eyhtr9re8fwjasd324"
+                  },
+                  "idUser": {
+                      "type": "string",
+                      "example": "fdt6y7we98hubhytrgfdsa"
+                  },
+                  "name": {
+                      "type": "string",
+                      "example": "Realizar atividade física"
+                  },
+                  "dataEstimatedTask": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "2021-08-10"
+                  },
+                  "dataConclusionTask": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "2021-08-12"
+                  }
+              }
+          }
+      },
+      "ResponseErro400": {
+          "type": "object",
+          "properties": {
+              "status": {
+                  "type": "number",
+                  "example": 400
+              },
+              "erro": {
+                  "type": "string",
+                  "example": "Parâmetros de entrada inválidos"
+              }
+          }
+      },
+      "ResponseErro401": {
+          "type": "object",
+          "properties": {
+              "status": {
+                  "type": "number",
+                  "example": 401
+              },
+              "erro": {
+                  "type": "string",
+                  "example": "Acesso negado"
+              }
+          }
+      },
+      "ResponseErro500": {
+          "type": "object",
+          "properties": {
+              "status": {
+                  "type": "number",
+                  "example": 500
+              },
+              "erro": {
+                  "type": "string",
+                  "example": "Erro ao processar a solicitação"
+              }
+          }
       }
-    },
-    "LoginResponse200": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "number",
-          "example": "1"
-        },
-        "name": {
-          "type": "string",
-          "example": "Fulano da Silva"
-        },
-        "email": {
-          "type": "string",
-          "example": "fulano@fulano.com"
-        },
-        "token": {
-          "type": "string",
-          "example": "fff5256524f315d12"
-        }
-      }
-    },
-    "UsuarioCadastroRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "example": "Fulano da Silva"
-        },
-        "email": {
-          "type": "string",
-          "example": "fulano@fulano.com"
-        },
-        "password": {
-          "type": "string",
-          "example": "senha"
-        }
-      }
-    },
-    "UsuarioCadastroResponse200": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "example": "Fulano da Silva"
-        },
-        "email": {
-          "type": "string",
-          "example": "fulano@fulano.com"
-        },
-        "password": {
-          "type": "string",
-          "example": "senha"
-        }
-      }
-    },
-    "ResponseErro": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "number",
-          "example": 400
-        },
-        "erro": {
-          "type": "string",
-          "example": "Parâmetros de entrada inválidos"
-        }
-      }
-    }
   }
 }
